@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: qudit-clifford-synthesis
+Version: 0.1.0
+Summary: Creating a reinforcement learning model for qudit Clifford synthesis.
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: Other/Proprietary License
+Classifier: Operating System :: MacOS
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: bqskit==1.2.0
+Requires-Dist: gymnasium==1.1.1
+Requires-Dist: matplotlib==3.10.3
+Requires-Dist: numpy==2.3.0
+Requires-Dist: optuna==4.3.0
+Requires-Dist: scipy==1.15.3
+Requires-Dist: stable_baselines3==2.6.0
+Requires-Dist: sympy==1.14.0
+Requires-Dist: torch==2.7.0

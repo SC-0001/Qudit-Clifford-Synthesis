@@ -1,0 +1,22 @@
+pyproject.toml
+src/qudit_clifford_synthesis/__init__.py
+src/qudit_clifford_synthesis.egg-info/PKG-INFO
+src/qudit_clifford_synthesis.egg-info/SOURCES.txt
+src/qudit_clifford_synthesis.egg-info/dependency_links.txt
+src/qudit_clifford_synthesis.egg-info/requires.txt
+src/qudit_clifford_synthesis.egg-info/top_level.txt
+src/qudit_clifford_synthesis/CliffSyn/CNN.py
+src/qudit_clifford_synthesis/CliffSyn/Curriculum.py
+src/qudit_clifford_synthesis/CliffSyn/Environment.py
+src/qudit_clifford_synthesis/CliffSyn/HyperParam.py
+src/qudit_clifford_synthesis/CliffSyn/__init__.py
+src/qudit_clifford_synthesis/Essentials/CliffGates.py
+src/qudit_clifford_synthesis/Essentials/Gates.py
+src/qudit_clifford_synthesis/Essentials/QuditCirc.py
+src/qudit_clifford_synthesis/Essentials/__init__.py
+src/qudit_clifford_synthesis/Evaluation/LEAP.py
+src/qudit_clifford_synthesis/Evaluation/MainEvaluation.py
+src/qudit_clifford_synthesis/Evaluation/QSD (WIP).py
+src/qudit_clifford_synthesis/Evaluation/SB3.py
+src/qudit_clifford_synthesis/Evaluation/SK (WIP).py
+src/qudit_clifford_synthesis/Evaluation/__init__.py

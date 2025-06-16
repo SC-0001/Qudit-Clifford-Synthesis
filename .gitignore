@@ -1,0 +1,16 @@
+# Python virtual environment
+/venv
+/.venv
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Large data files
+/data/Training_Data/
+/data/Evaluation_Data/
+
+# IDE and OS-specific files
+.idea/
+.vscode/
+*.DS_Store
