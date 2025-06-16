@@ -1,9 +1,5 @@
 # pyproject.toml
 
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "qudit-clifford-synthesis"
 version = "0.1.0"
@@ -15,10 +11,6 @@ classifiers = [
     "License :: Other/Proprietary License",
     "Operating System :: MacOS",
 ]
-
-[tool.setuptools.packages.find]
-where = ["src"]
-
 dependencies = [
   "bqskit==1.2.0",
   "gymnasium==1.1.1",
@@ -30,3 +22,10 @@ dependencies = [
   "sympy==1.14.0",
   "torch==2.7.0",
 ]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
