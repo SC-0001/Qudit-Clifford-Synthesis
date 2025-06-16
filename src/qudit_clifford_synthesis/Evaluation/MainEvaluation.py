@@ -133,7 +133,6 @@ def SingleExperiment(
     )
 
     env.reset()
-    print(f"Difficulty {difficulty} Completed")
     out_dict = {**sb3_results, **leap_results}
 
     return out_dict
@@ -191,7 +190,7 @@ def MultiExperiment(
                 difficulty_dict[method_name + "_" + metric_name] = []
         
         # Collecting data from multiple trials of the same difficulty
-        for _ in range(trials_per_difficulty):
+        for trial in range(1, trials_per_difficulty+1):
             result = SingleExperiment(
                 num_lvs = num_lvs, 
                 bi_coupling_map = bi_coupling_map, 
@@ -203,10 +202,15 @@ def MultiExperiment(
             for key, value in result.items():
                 difficulty_dict[key].append(value)
         
+            print(f"Trial {trial} Completed")
+        
         final_dict["difficulty"].append(difficulty)
         for key, value in difficulty_dict.items():
             final_dict[key + "_avg"].append(np.average(value))
             final_dict[key + "_err"].append(np.std(value))
+        
+        print(f"Difficulty {difficulty} Completed")
+    
     return final_dict
 
 def PlotMetrics(data_dict: Dict, save_path: str):

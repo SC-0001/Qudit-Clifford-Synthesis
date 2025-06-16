@@ -16,9 +16,10 @@ Although we currently work with the symplectic representation of Clifford gates�
     * [Environment Basics](#environment-basics)
     * [Reward](#reward)
     * [Training Strategy](#training-strategy)
-4. [Future Work](#future-work)
-5. [References](#references)
-6. [License](#license)
+4. [Preliminary Results](#preliminary-results)
+5. [Future Work](#future-work)
+6. [References](#references)
+7. [License](#license)
 
 ## Project Structure
 
@@ -126,13 +127,24 @@ The reward function is composed of several components:
 * **Adaptive Hyperparameters:** Key PPO hyperparameters like the `learning_rate` and `clip_range` are dynamically adjusted via `AdaptiveHyperparameterCallback`, based on the agent's recent performance. When the agent is struggling, exploration is encouraged by increasing these values; when it is succeeding, they are lowered to fine-tune the policy.
 * **Custom Feature Extractor:** The agent uses a `CustomCliffordCNN` feature extractor with an `nn.Embedding` layer to create dense vector representations (as opposed to when using one-hot encoding) of the sparse integer values in the observation tensor. This is followed by a convolutional layer and a MLP layer. The hope is that the convolutional layer will allow the model to learn about the simulated hardware's qudit couplings.
 
+## Preliminary Results
+
+Below is a comparison between the SB3 synthesis model and LEAP on 3 qutrits (`num_lvs = 3`) in a 1D array (linear connectivity) at small difficulties (1~7).
+
+![SB3 and LEAP Comparison](assets/3Lv_3L_Diff7_LEAP_vs_SB3.png)
+
+*Figure 1.* Comparing SB3 vs LEAP for Clifford circuit synthesis on 3 qutrits in a 1D array.
+
+Although SB3 achieves a ~1000× speedup in runtime, its fidelity (measured by the absolute value of the Hilbert–Schmidt inner product against the target) quickly trails starting difficulty 5, despite the model being trained until difficulty 7. This suggests current training parameters aren't strict enough.
+
 ## Future Work
 
 Several areas for future development have been identified:
 
-* **Implement Improved Solovay-Kitaev (SK) Algorithm**: Complete the `SK (WIP).py` implementation to provide a method for decomposing arbitrary single-qudit unitaries into a sequence of gates from our fixed gate set. This would allow for a more complete synthesis pipeline when combined with LEAP. (to compare against)
+* **Further Stabilize Learning**: Despite existing measures, we still observe sudden drops in success rate even after the agent goes through multiple difficulties smoothly. Furthermore, when we test models that are trained through high difficulties (50+) for low difficulty tasks, success rates oscillate around 0.8, strongly suggesting model forgetting. Some direct methods to reduce forgetting are (1) Increasing parameter count and (2) Increasing the frequency that the model is tested on lower difficulties by increasing `diff_ratio`. We can alternately change the current exponential distribution used for `effective_difficulty` selection, to something more linear.
+* **Improve GPU Compatibility**: Currently, it takes multiple hours to train a 1D 3-qutrit synthesis model upto a mere 10 difficulty levels on a 2020 Macbook Air. Training time is even worse on Google Colab's T4 GPU runtime due to training currently being CPU-bound. Thus, the environment and data-processing pipeline must be refactored to leverage GPUs' parallelization capabilities.
 * **Enhance Reward Function**: Refine the incremental reward metric in `Environment.py` to provide a more informative signal to the agent during training. Current metrics are based on intuition rather than mathematical rigor.
-* **Further Stabilize Learning**: Despite existing measures, we still observe sudden drops in success rate even after the agent goes through multiple difficulties smoothly.
+* **Implement Improved Solovay-Kitaev (SK) Algorithm**: Complete the `SK (WIP).py` implementation to provide a method for decomposing arbitrary single-qudit unitaries into a sequence of gates from our fixed gate set. This would allow for a more complete synthesis pipeline when combined with LEAP.
 
 ## References
 

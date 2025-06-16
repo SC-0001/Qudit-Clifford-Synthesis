@@ -31,18 +31,21 @@ if __name__ == "__main__":
         depth, runtime, Hilbert-Schmidt inner product, 
         no. of single-qudit gates saved, no. of CSUM gates saved
     """
+    import sys
+    import qudit_clifford_synthesis
+    sys.modules['CliffSyn'] = qudit_clifford_synthesis
 
     # Run the evaluation function.
     data_dict = MultiExperiment(
         num_lvs = 3, 
         bi_coupling_map = [[0, 1], [1, 2]], 
-        max_difficulty = 10, 
-        max_gates = 20, 
-        max_layer = 20,
-        trials_per_difficulty = 20, 
-        sb3_model_dir = "./Evaluation_Data/3Lv_3L_Diff10_model.zip")
+        max_difficulty = 7, 
+        max_gates = 10, 
+        max_layer = 10,
+        trials_per_difficulty = 10, 
+        sb3_model_dir = "./Evaluation_Data/3Lv_3L_Diff7_model.zip")
 
     # Generate and save plots comparing the two models' performance
     PlotMetrics(
         data_dict = data_dict,  
-        save_path = "./Evaluation_Data/LEAP vs SB3 Clifford Synthesis Comparison.png")
+        save_path = "./Evaluation_Data/3Lv_3L_Diff7_LEAP_vs_SB3.png")

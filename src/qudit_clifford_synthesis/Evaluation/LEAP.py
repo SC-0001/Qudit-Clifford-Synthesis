@@ -14,6 +14,7 @@ from bqskit.compiler import Compiler, MachineModel
 from bqskit.ir import Circuit
 from bqskit.ir.gates.constant import CSUMGate
 from bqskit.ir.gates.parameterized.unitary import VariableUnitaryGate
+from bqskit.qis.unitary import UnitaryMatrix
 
 from qudit_clifford_synthesis.Essentials.CliffGates import CliffGateSet
 from qudit_clifford_synthesis.Essentials.QuditCirc import QuditCircuit
@@ -31,9 +32,9 @@ def HistoryToUnitary(
     Converts the "gate_placement_history" attribute of a QuditCircuit instance to its
     corresponding unitary representation.
     
-    num_qudits (int): Number of energy levels of the QuditCircuit instance
+    num_qudits (int): Number of qudits in the QuditCircuit instance
     
-    num_lvs (int): Number of qudits in the QuditCircuit instance
+    num_lvs (int): Number of energy levels of the QuditCircuit instance
     
     gate_placement_history (list[dict[str, Any]]): "gate_placement_history" attribute of 
         the QuditCircuit instance 
@@ -86,6 +87,7 @@ def EvaluateLEAP(
     
     # Defining a machine model to enforce the provided coupling map
     coupling_graph = [tuple(elem) for elem in bi_coupling_map]
+    
     model = MachineModel(
         num_qudits = num_qudits, 
         radixes = radixes, 
@@ -93,7 +95,10 @@ def EvaluateLEAP(
     )
 
     init_circuit = Circuit(num_qudits = num_qudits, radixes = radixes)
-    input_circuit = init_circuit.from_unitary(utry = target_unitary)
+    # We wrap the target unitary because directly doing .from_unitary(utry = target_unitary) causes a bug
+    # where it's automatically assumed num_lvs = 2 if target_unitary.shape[0] is a power of 2.
+    wrapped_target_unitary = UnitaryMatrix(input = target_unitary, radixes = radixes)
+    input_circuit = init_circuit.from_unitary(utry = wrapped_target_unitary)
 
     # Due to LEAP (and BQSKit's default compiler) having difficulty with a gateset 
     # consisting only of constant (non-parametrized) gates, we decompose the 

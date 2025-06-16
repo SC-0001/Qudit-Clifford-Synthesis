@@ -1,3 +1,4 @@
+README.md
 pyproject.toml
 src/qudit_clifford_synthesis/__init__.py
 src/qudit_clifford_synthesis.egg-info/PKG-INFO
