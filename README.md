@@ -1,8 +1,8 @@
 # Qudit Clifford Circuit Synthesis using Reinforcement Learning
 
-In this project we attempt to develop a reinforcement learning (RL) agent capable of synthesizing Clifford circuits on homogeneous qudits. The agent simply observes the (symplectic) matrix representation of the target and places a gate from a fixed Clifford gate set onto its own circuit. This continues until the synthesis is complete or the agent uses up it's maximum gate allowance.
+In this project we attempt to develop a reinforcement learning (RL) agent capable of synthesizing Clifford circuits on homogeneous qudits. The agent simply observes the (symplectic) matrix representation of the target and places a gate from a fixed Clifford gate set onto its own circuit. This continues until the synthesis is complete or the agent uses up its maximum gate allowance.
 
-Although we currently work with the symplectic representation of Clifford gates due to the matrix size growing linearly with respect to the qudit count (rather than unitary representations' exponential size), the simple structure of the training environment allows for easy generalization to alternate represenations and gate sets.
+Although we currently work with the symplectic representation of Clifford gates—due to the matrix size growing linearly with respect to the qudit count, rather than the exponential growth of unitary representations—the simple structure of the training environment allows for easy generalization to alternate represenations and gate sets.
 
 ## Table of Contents
 
@@ -72,7 +72,7 @@ To start training a new agent or continue training a pre-existing model, run the
 python examples/Train.py
 ```
 
-There are too many parameters for on-the-fly keyboard inputs, so those should be modified manually within the Train.py file. By default, training progress, models, and logs are saved in the `./Training_Data/3Lv_3L_Ongoing` directory.
+There are too many parameters for on-the-fly keyboard inputs, so these should be modified manually within the Train.py file. By default, training progress, models, and logs are saved in the `./Training_Data/3Lv_3L_Ongoing` directory.
 
 You can monitor the training process in real-time using TensorBoard:
 
@@ -82,7 +82,7 @@ You can monitor the training process in real-time using TensorBoard:
 
 ### Tuning Hyperparameters
 
-To find the optimal hyperparameters for training, run the tuning script from the `examples` directory. By default, training logs, best models, and the optimization result is stored in `./Training_Data/3Lv_3L_Hyp`.
+To find the optimal hyperparameters for training, run the tuning script from the `examples` directory. By default, training logs, best models, and the optimization result are stored in `./Training_Data/3Lv_3L_Hyp`.
 
 ```bash
 python examples/TuneHyp.py
@@ -102,12 +102,12 @@ This script runs multiple trials for target circuits of varying difficulty. It c
 
 ## Implementation Details
 
-The agent is trained using the Proximal Policy Optimization (PPO) algorithm from Stable-Baselines3 within a custom `gymnasium` environment `CliffordSynthesisEnv`.
+The agent is trained using the Proximal Policy Optimization (PPO) algorithm from Stable-Baselines3 within a custom `gymnasium` environment, `CliffordSynthesisEnv`.
 
 ### Environment Basics
 
-* **Goal:** The synthesis problem is framed as a sequence of choices where the agent's goal is to reverse a target Clifford operation back to the identity matrix. If the agent applies a sequence of gates `G_1, G_2, ..., G_k`, the initial target `U_target` is updated to `U_target @ G_1_inv @ G_2_inv @, ... G_k_inv`. Then, instead of having to pass-through both the initial target and the agent's current circuit at each step, the agent can merely observe the updated target and predict which gate, placed on which qudit(s) is most likely to lead to correct synthesis.
-* **State/Observation:** At each step, the agent observes the symplectic matrix of the *remaining* target operation. This `(2n, 2n)` integer matrix is reshaped into a `(4, n, n)` tensor to be fed into a CNN feature extractor.
+* **Goal:** The synthesis problem is framed as a sequence of choices where the agent's goal is to reverse a target Clifford operation back to the identity matrix. If the agent applies a sequence of gates `G_1, G_2, ..., G_k`, the initial target `U_target` is updated to `U_target @ G_1_inv @ G_2_inv @, ... G_k_inv`. This way, instead of having to pass-through both the initial target and the agent's current circuit at each step, the agent can merely observe the updated target and predict which gate, placed on which qudit(s) is most likely to lead to correct synthesis.
+* **State/Observation:** At each step, the agent observes the symplectic matrix of the remaining target operation. This `(2n, 2n)` integer matrix is reshaped into a `(4, n, n)` tensor to be fed into a CNN feature extractor.
 * **Action Space:** The agent's action space is a single discrete integer, which maps to a specific gate (e.g., Fourier `F`, Phase `P`, `SUM`) applied to a specific qudit or pair of qudits.
 
 ### Reward
@@ -124,15 +124,15 @@ The reward function is composed of several components:
 * **Curriculum Learning:** The agent begins by training on simple circuits (`difficulty` = 1). The `TrainCurriculum` uses `SuccessStopCallback` to automatically increase the difficulty after the agent achieves a consistent success rate (e.g., > 95%) on the current level. This ensures a smooth learning progression.
 * **Mixing Difficulties** To fight against catastrophic forgetting, we randomly select an "effective difficulty" when creating an environment instance, maxed at the actual difficulty. We currently follow an exponential distribution for the random selection to bias more towards higher difficulties. The intention is to make sure generalization occurs at a decent rate during training.
 * **Adaptive Hyperparameters:** Key PPO hyperparameters like the `learning_rate` and `clip_range` are dynamically adjusted via `AdaptiveHyperparameterCallback`, based on the agent's recent performance. When the agent is struggling, exploration is encouraged by increasing these values; when it is succeeding, they are lowered to fine-tune the policy.
-* **Custom Feature Extractor:** The agent uses a `CustomCliffordCNN` feature extractor with an `nn.Embedding` layer to create dense vector representations (as opposed to when using one-hot encoding) of the sparse integer values in the observation tensor. This is followed by a convolutional layer and a MLP layer. The hope with the convolutional layer is that the model will learn something about the simulated hardware's qudit couplings.
+* **Custom Feature Extractor:** The agent uses a `CustomCliffordCNN` feature extractor with an `nn.Embedding` layer to create dense vector representations (as opposed to when using one-hot encoding) of the sparse integer values in the observation tensor. This is followed by a convolutional layer and a MLP layer. The hope is that the convolutional layer will allow the model to learn about the simulated hardware's qudit couplings.
 
 ## Future Work
 
 Several areas for future development have been identified:
 
 * **Implement Improved Solovay-Kitaev (SK) Algorithm**: Complete the `SK (WIP).py` implementation to provide a method for decomposing arbitrary single-qudit unitaries into a sequence of gates from our fixed gate set. This would allow for a more complete synthesis pipeline when combined with LEAP. (to compare against)
-* **Enhance Reward Function**: Refine the incremental reward metric in `Environment.py` to provide a more informative signal to the agent during training. Current metrics merely come from intuition rather than rigor.
-* **Further Stabilize Learning**: Despite existing measures, we still observe sudden drops in success rate even after going through multiple difficulties smoothly.
+* **Enhance Reward Function**: Refine the incremental reward metric in `Environment.py` to provide a more informative signal to the agent during training. Current metrics are based on intuition rather than mathematical rigor.
+* **Further Stabilize Learning**: Despite existing measures, we still observe sudden drops in success rate even after the agent goes through multiple difficulties smoothly.
 
 ## References
 
